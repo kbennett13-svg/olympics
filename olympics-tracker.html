@@ -1,0 +1,1866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>2026 Winter Olympics Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066B3;
+            --primary-dark: #004d86;
+            --accent: #E63946;
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --bronze: #CD7F32;
+            --bg: #F8FAFC;
+            --card: #FFFFFF;
+            --text: #1E293B;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --success: #10B981;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .olympic-rings {
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .logo-subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--bg);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item.active .nav-icon {
+            transform: scale(1.1);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            transition: transform 0.2s;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--primary);
+        }
+
+        .filter-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Date Picker */
+        .date-picker {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .date-picker::-webkit-scrollbar {
+            display: none;
+        }
+
+        .date-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: var(--card);
+            border: 2px solid transparent;
+            cursor: pointer;
+            min-width: 60px;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .date-item:hover {
+            border-color: var(--primary);
+        }
+
+        .date-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .date-item.today {
+            border-color: var(--accent);
+        }
+
+        .date-item.has-events {
+            background: #E8F4FC;
+        }
+
+        .date-item.has-medal::after {
+            content: '🏅';
+            font-size: 8px;
+            margin-top: 2px;
+        }
+
+        .date-item.active.has-medal::after {
+            content: '🏅';
+        }
+
+        .date-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .date-day {
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+
+        .date-num {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Event List */
+        .event-item {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            background: var(--card);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: var(--shadow);
+        }
+
+        .event-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .event-time {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 50px;
+            padding-right: 12px;
+            border-right: 2px solid var(--border);
+        }
+
+        .event-hour {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .event-period {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .event-details {
+            flex: 1;
+        }
+
+        .event-sport {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .event-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .event-venue {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .event-status {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .event-status.live {
+            background: var(--accent);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .event-status.upcoming {
+            background: var(--bg);
+            color: var(--text-muted);
+        }
+
+        .event-status.completed {
+            background: var(--success);
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .event-favorite {
+            padding: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: transform 0.2s;
+        }
+
+        .event-favorite:hover {
+            transform: scale(1.2);
+        }
+
+        .event-favorite.active {
+            color: var(--gold);
+        }
+
+        /* Medal Table */
+        .medal-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .medal-table th,
+        .medal-table td {
+            padding: 12px;
+            text-align: center;
+        }
+
+        .medal-table th {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .medal-table tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .medal-table tbody tr:hover {
+            background: var(--bg);
+        }
+
+        .country-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+        }
+
+        .country-flag {
+            font-size: 20px;
+        }
+
+        .country-name {
+            font-weight: 500;
+        }
+
+        .medal-count {
+            font-weight: 700;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .medal-gold {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #333;
+        }
+
+        .medal-silver {
+            background: linear-gradient(135deg, #E8E8E8, #A0A0A0);
+            color: #333;
+        }
+
+        .medal-bronze {
+            background: linear-gradient(135deg, #CD7F32, #8B4513);
+            color: white;
+        }
+
+        .total-count {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* Athlete Cards */
+        .athlete-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+        }
+
+        .athlete-card {
+            background: var(--card);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .athlete-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .athlete-photo {
+            width: 100%;
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+        }
+
+        .athlete-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .athlete-info {
+            padding: 12px;
+        }
+
+        .athlete-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .athlete-country {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .athlete-sport {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        /* Search */
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            font-family: inherit;
+            background: transparent;
+        }
+
+        .search-icon {
+            color: var(--text-muted);
+            font-size: 20px;
+        }
+
+        /* Favorites Page */
+        .favorites-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .favorites-empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .favorites-empty h3 {
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card);
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--card);
+        }
+
+        .modal-title {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg);
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* Countdown */
+        .countdown-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .countdown-title {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .countdown-numbers {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .countdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .countdown-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .countdown-label {
+            font-size: 11px;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header {
+                padding: 12px 16px;
+            }
+
+            .logo-text {
+                font-size: 16px;
+            }
+
+            .main {
+                padding: 16px;
+            }
+
+            .athlete-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .medal-table th,
+            .medal-table td {
+                padding: 8px 4px;
+                font-size: 13px;
+            }
+
+            .medal-count {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+
+            .country-name {
+                font-size: 13px;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="olympic-rings">🏔️</span>
+                <div>
+                    <div class="logo-text">Milano Cortina 2026</div>
+                    <div class="logo-subtitle">Winter Olympics Tracker</div>
+                </div>
+            </div>
+            <div class="sync-status">
+                <span class="sync-dot"></span>
+                <span id="syncStatus">Synced</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Schedule Tab -->
+        <div id="scheduleTab" class="tab-content active">
+            <!-- Countdown -->
+            <div class="countdown-card" id="countdownCard">
+                <div class="countdown-title">Olympics Begin In</div>
+                <div class="countdown-numbers" id="countdown">
+                    <div class="countdown-item">
+                        <span class="countdown-value" id="countDays">--</span>
+                        <span class="countdown-label">Days</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-value" id="countHours">--</span>
+                        <span class="countdown-label">Hours</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-value" id="countMins">--</span>
+                        <span class="countdown-label">Minutes</span>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="section-title">📅 Event Schedule</h2>
+
+            <!-- Date Picker -->
+            <div class="date-picker" id="datePicker"></div>
+
+            <!-- Sport Filters -->
+            <div class="filters" id="sportFilters"></div>
+
+            <!-- Events List -->
+            <div id="eventsList"></div>
+        </div>
+
+        <!-- Medals Tab -->
+        <div id="medalsTab" class="tab-content">
+            <h2 class="section-title">🏅 Medal Standings</h2>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalGold">0</div>
+                    <div class="stat-label">Gold Medals</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalMedals">0</div>
+                    <div class="stat-label">Total Medals</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <table class="medal-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left">Country</th>
+                            <th>🥇</th>
+                            <th>🥈</th>
+                            <th>🥉</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medalTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Athletes Tab -->
+        <div id="athletesTab" class="tab-content">
+            <h2 class="section-title">👤 Athletes</h2>
+
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="athleteSearch" placeholder="Search athletes...">
+            </div>
+
+            <!-- Country Filter -->
+            <div class="filters" id="countryFilters"></div>
+
+            <!-- Athletes Grid -->
+            <div class="athlete-grid" id="athleteGrid"></div>
+        </div>
+
+        <!-- Favorites Tab -->
+        <div id="favoritesTab" class="tab-content">
+            <h2 class="section-title">⭐ My Favorites</h2>
+
+            <div id="favoriteEvents">
+                <h3 style="font-size: 16px; margin-bottom: 12px;">Favorite Events</h3>
+                <div id="favoriteEventsList"></div>
+            </div>
+
+            <div id="favoriteAthletes" style="margin-top: 24px;">
+                <h3 style="font-size: 16px; margin-bottom: 12px;">Favorite Athletes</h3>
+                <div class="athlete-grid" id="favoriteAthletesList"></div>
+            </div>
+
+            <div class="favorites-empty" id="favoritesEmpty" style="display: none;">
+                <div class="favorites-empty-icon">⭐</div>
+                <h3>No Favorites Yet</h3>
+                <p>Tap the star icon on events or athletes to add them to your favorites.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a class="nav-item active" data-tab="scheduleTab">
+            <span class="nav-icon">📅</span>
+            <span class="nav-label">Schedule</span>
+        </a>
+        <a class="nav-item" data-tab="medalsTab">
+            <span class="nav-icon">🏅</span>
+            <span class="nav-label">Medals</span>
+        </a>
+        <a class="nav-item" data-tab="athletesTab">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">Athletes</span>
+        </a>
+        <a class="nav-item" data-tab="favoritesTab">
+            <span class="nav-icon">⭐</span>
+            <span class="nav-label">Favorites</span>
+        </a>
+    </nav>
+
+    <!-- Event Detail Modal -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Event Details</span>
+                <button class="modal-close" onclick="closeModal('eventModal')">×</button>
+            </div>
+            <div class="modal-body" id="eventModalBody"></div>
+        </div>
+    </div>
+
+    <!-- Athlete Detail Modal -->
+    <div class="modal-overlay" id="athleteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Athlete Profile</span>
+                <button class="modal-close" onclick="closeModal('athleteModal')">×</button>
+            </div>
+            <div class="modal-body" id="athleteModalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // DATA STORE
+        // ========================================
+        const OlympicsData = {
+            // Olympics Info
+            info: {
+                name: "Milano Cortina 2026",
+                startDate: "2026-02-06",
+                endDate: "2026-02-22",
+                location: "Milan & Cortina d'Ampezzo, Italy"
+            },
+
+            // Sports
+            sports: [
+                { id: "alpine", name: "Alpine Skiing", emoji: "⛷️" },
+                { id: "biathlon", name: "Biathlon", emoji: "🎿" },
+                { id: "bobsled", name: "Bobsled", emoji: "🛷" },
+                { id: "cross-country", name: "Cross-Country Skiing", emoji: "🎿" },
+                { id: "curling", name: "Curling", emoji: "🥌" },
+                { id: "figure-skating", name: "Figure Skating", emoji: "⛸️" },
+                { id: "freestyle", name: "Freestyle Skiing", emoji: "🎿" },
+                { id: "hockey", name: "Ice Hockey", emoji: "🏒" },
+                { id: "luge", name: "Luge", emoji: "🛷" },
+                { id: "nordic-combined", name: "Nordic Combined", emoji: "🎿" },
+                { id: "short-track", name: "Short Track", emoji: "⛸️" },
+                { id: "skeleton", name: "Skeleton", emoji: "🛷" },
+                { id: "ski-jumping", name: "Ski Jumping", emoji: "🎿" },
+                { id: "snowboard", name: "Snowboard", emoji: "🏂" },
+                { id: "speed-skating", name: "Speed Skating", emoji: "⛸️" }
+            ],
+
+            // Events - Enhanced with medal flags, teams, results, and links
+            // medal: true = medals awarded, teams: array of countries/teams, result: winner info
+            // liveUrl: link to live coverage, highlightsUrl: link to highlights
+            events: [
+                // Feb 4 - Preliminary Events
+                { id: "p1", date: "2026-02-04", time: "09:00", sport: "curling", name: "Mixed Doubles Round Robin - Session 1", venue: "Cortina Olympic Centre", status: "upcoming", teams: ["🇺🇸 USA", "🇨🇦 Canada", "🇮🇹 Italy", "🇳🇴 Norway"] },
+                { id: "p2", date: "2026-02-04", time: "14:00", sport: "curling", name: "Mixed Doubles Round Robin - Session 2", venue: "Cortina Olympic Centre", status: "upcoming", teams: ["🇬🇧 Great Britain", "🇸🇪 Sweden", "🇨🇭 Switzerland", "🇯🇵 Japan"] },
+                { id: "p3", date: "2026-02-04", time: "20:00", sport: "curling", name: "Mixed Doubles Round Robin - Session 3", venue: "Cortina Olympic Centre", status: "upcoming", teams: ["🇨🇳 China", "🇰🇷 South Korea", "🇦🇺 Australia", "🇨🇿 Czech Republic"] },
+
+                // Feb 5 - Preliminary Events
+                { id: "p4", date: "2026-02-05", time: "09:00", sport: "curling", name: "Mixed Doubles Round Robin - Session 4", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "p5", date: "2026-02-05", time: "14:00", sport: "curling", name: "Mixed Doubles Round Robin - Session 5", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "p6", date: "2026-02-05", time: "20:00", sport: "curling", name: "Mixed Doubles Round Robin - Session 6", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "p7", date: "2026-02-05", time: "12:00", sport: "hockey", name: "Women's Preliminary - Group A", venue: "PalaItalia Santa Giulia", status: "upcoming", teams: ["🇺🇸 USA vs 🇫🇮 Finland"] },
+                { id: "p8", date: "2026-02-05", time: "16:30", sport: "hockey", name: "Women's Preliminary - Group B", venue: "PalaItalia Santa Giulia", status: "upcoming", teams: ["🇨🇦 Canada vs 🇸🇪 Sweden"] },
+                { id: "p9", date: "2026-02-05", time: "21:00", sport: "hockey", name: "Women's Preliminary - Group A", venue: "PalaItalia Santa Giulia", status: "upcoming", teams: ["🇨🇭 Switzerland vs 🇯🇵 Japan"] },
+
+                // Opening Ceremony
+                { id: "e1", date: "2026-02-06", time: "20:00", sport: "ceremony", name: "Opening Ceremony", venue: "San Siro Stadium", status: "upcoming" },
+
+                // Feb 6 - More curling
+                { id: "c1", date: "2026-02-06", time: "09:00", sport: "curling", name: "Mixed Doubles Round Robin - Session 7", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "c2", date: "2026-02-06", time: "14:00", sport: "curling", name: "Mixed Doubles Round Robin - Session 8", venue: "Cortina Olympic Centre", status: "upcoming" },
+
+                // Feb 7 - First medal events!
+                { id: "e2", date: "2026-02-07", time: "10:00", sport: "biathlon", name: "Mixed Relay", venue: "Anterselva", status: "upcoming", medal: true },
+                { id: "e3", date: "2026-02-07", time: "10:30", sport: "cross-country", name: "Skiathlon Women", venue: "Tesero", status: "upcoming", medal: true },
+                { id: "e4", date: "2026-02-07", time: "11:00", sport: "ski-jumping", name: "Normal Hill Individual", venue: "Predazzo", status: "upcoming", medal: true },
+                { id: "e5", date: "2026-02-07", time: "12:00", sport: "speed-skating", name: "5000m Men", venue: "Baselga di Piné", status: "upcoming", medal: true },
+                { id: "e6", date: "2026-02-07", time: "14:00", sport: "short-track", name: "Mixed Team Relay", venue: "Milan", status: "upcoming", medal: true },
+                { id: "e7", date: "2026-02-07", time: "19:00", sport: "figure-skating", name: "Team Event - Short", venue: "Milan", status: "upcoming" },
+                { id: "c3", date: "2026-02-07", time: "09:00", sport: "curling", name: "Mixed Doubles Semifinal 1", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "c4", date: "2026-02-07", time: "14:00", sport: "curling", name: "Mixed Doubles Semifinal 2", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "c5", date: "2026-02-07", time: "20:00", sport: "curling", name: "Mixed Doubles Bronze Medal Game", venue: "Cortina Olympic Centre", status: "upcoming", medal: true },
+
+                // Feb 8
+                { id: "c6", date: "2026-02-08", time: "09:00", sport: "curling", name: "Mixed Doubles Gold Medal Game", venue: "Cortina Olympic Centre", status: "upcoming", medal: true },
+                { id: "e8", date: "2026-02-08", time: "09:30", sport: "alpine", name: "Downhill Men", venue: "Bormio", status: "upcoming", medal: true },
+                { id: "e10", date: "2026-02-08", time: "11:00", sport: "cross-country", name: "Skiathlon Men", venue: "Tesero", status: "upcoming", medal: true },
+                { id: "e9", date: "2026-02-08", time: "14:00", sport: "curling", name: "Men's Round Robin - Session 1", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "e11", date: "2026-02-08", time: "14:00", sport: "luge", name: "Men's Singles Run 1-2", venue: "Cortina", status: "upcoming" },
+                { id: "e12", date: "2026-02-08", time: "16:00", sport: "snowboard", name: "Slopestyle Women Quals", venue: "Livigno", status: "upcoming" },
+                { id: "c7", date: "2026-02-08", time: "20:00", sport: "curling", name: "Women's Round Robin - Session 1", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "e13", date: "2026-02-08", time: "20:00", sport: "hockey", name: "Women's Preliminary", venue: "Milan", status: "upcoming", teams: ["🇺🇸 USA vs 🇨🇦 Canada"] },
+
+                // Feb 9
+                { id: "c8", date: "2026-02-09", time: "09:00", sport: "curling", name: "Men's Round Robin - Session 2", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "e14", date: "2026-02-09", time: "10:00", sport: "biathlon", name: "Sprint Women", venue: "Anterselva", status: "upcoming", medal: true },
+                { id: "e15", date: "2026-02-09", time: "11:00", sport: "alpine", name: "Super-G Women", venue: "Cortina", status: "upcoming", medal: true },
+                { id: "e16", date: "2026-02-09", time: "13:00", sport: "freestyle", name: "Moguls Women Final", venue: "Livigno", status: "upcoming", medal: true },
+                { id: "e17", date: "2026-02-09", time: "15:00", sport: "speed-skating", name: "3000m Women", venue: "Baselga di Piné", status: "upcoming", medal: true },
+                { id: "e18", date: "2026-02-09", time: "19:30", sport: "figure-skating", name: "Team Event - Free", venue: "Milan", status: "upcoming", medal: true },
+                { id: "c9", date: "2026-02-09", time: "20:00", sport: "curling", name: "Women's Round Robin - Session 2", venue: "Cortina Olympic Centre", status: "upcoming" },
+
+                // Feb 10
+                { id: "c10", date: "2026-02-10", time: "09:00", sport: "curling", name: "Men's Round Robin - Session 3", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "e19", date: "2026-02-10", time: "09:30", sport: "alpine", name: "Super-G Men", venue: "Bormio", status: "upcoming", medal: true },
+                { id: "e20", date: "2026-02-10", time: "10:00", sport: "biathlon", name: "Sprint Men", venue: "Anterselva", status: "upcoming", medal: true },
+                { id: "e21", date: "2026-02-10", time: "11:30", sport: "snowboard", name: "Slopestyle Women Final", venue: "Livigno", status: "upcoming", medal: true },
+                { id: "e22", date: "2026-02-10", time: "14:00", sport: "bobsled", name: "Two-Man Run 1-2", venue: "Cortina", status: "upcoming" },
+                { id: "e23", date: "2026-02-10", time: "16:00", sport: "short-track", name: "1000m Women Heats", venue: "Milan", status: "upcoming" },
+                { id: "c11", date: "2026-02-10", time: "20:00", sport: "curling", name: "Women's Round Robin - Session 3", venue: "Cortina Olympic Centre", status: "upcoming" },
+
+                // Feb 11
+                { id: "c12", date: "2026-02-11", time: "09:00", sport: "curling", name: "Men's Round Robin - Session 4", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "e24", date: "2026-02-11", time: "10:00", sport: "cross-country", name: "10km Classic Women", venue: "Tesero", status: "upcoming", medal: true },
+                { id: "e25", date: "2026-02-11", time: "14:00", sport: "freestyle", name: "Aerials Mixed Team", venue: "Livigno", status: "upcoming", medal: true },
+                { id: "c13", date: "2026-02-11", time: "20:00", sport: "curling", name: "Women's Round Robin - Session 4", venue: "Cortina Olympic Centre", status: "upcoming" },
+
+                // Feb 12
+                { id: "c14", date: "2026-02-12", time: "09:00", sport: "curling", name: "Men's Round Robin - Session 5", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "e26", date: "2026-02-12", time: "10:00", sport: "alpine", name: "Downhill Women", venue: "Cortina", status: "upcoming", medal: true },
+                { id: "e27", date: "2026-02-12", time: "19:00", sport: "figure-skating", name: "Men Short Program", venue: "Milan", status: "upcoming" },
+                { id: "c15", date: "2026-02-12", time: "20:00", sport: "curling", name: "Women's Round Robin - Session 5", venue: "Cortina Olympic Centre", status: "upcoming" },
+
+                // Feb 13
+                { id: "c16", date: "2026-02-13", time: "09:00", sport: "curling", name: "Men's Round Robin - Session 6", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "e28", date: "2026-02-13", time: "11:00", sport: "snowboard", name: "Halfpipe Women Final", venue: "Livigno", status: "upcoming", medal: true },
+                { id: "c17", date: "2026-02-13", time: "20:00", sport: "curling", name: "Women's Round Robin - Session 6", venue: "Cortina Olympic Centre", status: "upcoming" },
+
+                // Feb 14
+                { id: "e29", date: "2026-02-14", time: "10:00", sport: "biathlon", name: "Individual Women", venue: "Anterselva", status: "upcoming", medal: true },
+                { id: "c18", date: "2026-02-14", time: "14:00", sport: "curling", name: "Men's Round Robin - Session 7", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "e30", date: "2026-02-14", time: "19:30", sport: "figure-skating", name: "Men Free Skate", venue: "Milan", status: "upcoming", medal: true },
+
+                // Feb 15
+                { id: "e31", date: "2026-02-15", time: "09:30", sport: "alpine", name: "Giant Slalom Women", venue: "Cortina", status: "upcoming", medal: true },
+                { id: "c19", date: "2026-02-15", time: "14:00", sport: "curling", name: "Women's Round Robin - Session 7", venue: "Cortina Olympic Centre", status: "upcoming" },
+
+                // Feb 16
+                { id: "e32", date: "2026-02-16", time: "10:00", sport: "cross-country", name: "Relay Women", venue: "Tesero", status: "upcoming", medal: true },
+                { id: "c20", date: "2026-02-16", time: "14:00", sport: "curling", name: "Men's Round Robin - Session 8", venue: "Cortina Olympic Centre", status: "upcoming" },
+
+                // Feb 17
+                { id: "c21", date: "2026-02-17", time: "14:00", sport: "curling", name: "Women's Round Robin - Session 8", venue: "Cortina Olympic Centre", status: "upcoming" },
+                { id: "e33", date: "2026-02-17", time: "19:00", sport: "figure-skating", name: "Ice Dance Free", venue: "Milan", status: "upcoming", medal: true },
+
+                // Feb 18
+                { id: "e34", date: "2026-02-18", time: "10:00", sport: "biathlon", name: "Mass Start Women", venue: "Anterselva", status: "upcoming", medal: true },
+                { id: "c22", date: "2026-02-18", time: "14:00", sport: "curling", name: "Men's Semifinal", venue: "Cortina Olympic Centre", status: "upcoming" },
+
+                // Feb 19
+                { id: "e35", date: "2026-02-19", time: "09:30", sport: "alpine", name: "Slalom Women", venue: "Cortina", status: "upcoming", medal: true },
+                { id: "c23", date: "2026-02-19", time: "14:00", sport: "curling", name: "Women's Semifinal", venue: "Cortina Olympic Centre", status: "upcoming" },
+
+                // Feb 20
+                { id: "c24", date: "2026-02-20", time: "09:00", sport: "curling", name: "Men's Bronze Medal Game", venue: "Cortina Olympic Centre", status: "upcoming", medal: true },
+                { id: "e36", date: "2026-02-20", time: "12:00", sport: "hockey", name: "Women's Gold Medal Game", venue: "Milan", status: "upcoming", medal: true, teams: ["TBD vs TBD"] },
+                { id: "c25", date: "2026-02-20", time: "14:00", sport: "curling", name: "Women's Bronze Medal Game", venue: "Cortina Olympic Centre", status: "upcoming", medal: true },
+
+                // Feb 21
+                { id: "c26", date: "2026-02-21", time: "09:00", sport: "curling", name: "Men's Gold Medal Game", venue: "Cortina Olympic Centre", status: "upcoming", medal: true },
+                { id: "e37", date: "2026-02-21", time: "19:00", sport: "figure-skating", name: "Exhibition Gala", venue: "Milan", status: "upcoming" },
+
+                // Feb 22 - Final Day
+                { id: "c27", date: "2026-02-22", time: "09:00", sport: "curling", name: "Women's Gold Medal Game", venue: "Cortina Olympic Centre", status: "upcoming", medal: true },
+                { id: "e38", date: "2026-02-22", time: "12:00", sport: "cross-country", name: "50km Mass Start Men", venue: "Tesero", status: "upcoming", medal: true },
+                { id: "e39", date: "2026-02-22", time: "16:00", sport: "hockey", name: "Men's Gold Medal Game", venue: "Milan", status: "upcoming", medal: true, teams: ["TBD vs TBD"] },
+                { id: "e40", date: "2026-02-22", time: "20:00", sport: "ceremony", name: "Closing Ceremony", venue: "Verona Arena", status: "upcoming" }
+            ],
+
+            // Athletes (sample Team USA + notable international)
+            athletes: [
+                // USA Figure Skating
+                { id: "a1", name: "Ilia Malinin", country: "USA", countryFlag: "🇺🇸", sport: "figure-skating", discipline: "Men's Singles", bio: "Known as the 'Quad God' for landing the first quad axel in competition. 2024 World Champion.", photo: null },
+                { id: "a2", name: "Madison Chock", country: "USA", countryFlag: "🇺🇸", sport: "figure-skating", discipline: "Ice Dance", bio: "World Champion ice dancer, part of the dominant Chock/Bates team.", photo: null },
+                { id: "a3", name: "Evan Bates", country: "USA", countryFlag: "🇺🇸", sport: "figure-skating", discipline: "Ice Dance", bio: "Multiple World medalist, partnered with Madison Chock.", photo: null },
+                { id: "a21", name: "Isabeau Levito", country: "USA", countryFlag: "🇺🇸", sport: "figure-skating", discipline: "Women's Singles", bio: "Rising star, 2023 World silver medalist, known for elegant artistry.", photo: null },
+                { id: "a22", name: "Amber Glenn", country: "USA", countryFlag: "🇺🇸", sport: "figure-skating", discipline: "Women's Singles", bio: "2024 US Champion, powerful jumper with strong technical skills.", photo: null },
+                { id: "a23", name: "Jason Brown", country: "USA", countryFlag: "🇺🇸", sport: "figure-skating", discipline: "Men's Singles", bio: "Olympic bronze medalist in team event, known for exceptional artistry and spins.", photo: null },
+
+                // USA Alpine
+                { id: "a4", name: "Mikaela Shiffrin", country: "USA", countryFlag: "🇺🇸", sport: "alpine", discipline: "All Events", bio: "Most decorated World Cup alpine skier in history with 95+ wins.", photo: null },
+                { id: "a24", name: "River Radamus", country: "USA", countryFlag: "🇺🇸", sport: "alpine", discipline: "Giant Slalom/Super-G", bio: "Top American men's technical skier, World Cup podium finisher.", photo: null },
+                { id: "a25", name: "Ryan Cochran-Siegle", country: "USA", countryFlag: "🇺🇸", sport: "alpine", discipline: "Super-G/Downhill", bio: "2022 Olympic silver medalist in Super-G, son of 1972 Olympic champion.", photo: null },
+                { id: "a26", name: "Breezy Johnson", country: "USA", countryFlag: "🇺🇸", sport: "alpine", discipline: "Downhill/Super-G", bio: "Multiple World Cup podiums in speed events, fearless competitor.", photo: null },
+
+                // USA Snowboard
+                { id: "a6", name: "Chloe Kim", country: "USA", countryFlag: "🇺🇸", sport: "snowboard", discipline: "Halfpipe", bio: "Two-time Olympic gold medalist in halfpipe, most dominant rider of her era.", photo: null },
+                { id: "a27", name: "Red Gerard", country: "USA", countryFlag: "🇺🇸", sport: "snowboard", discipline: "Slopestyle", bio: "2018 Olympic gold medalist in slopestyle at age 17.", photo: null },
+                { id: "a28", name: "Julia Marino", country: "USA", countryFlag: "🇺🇸", sport: "snowboard", discipline: "Slopestyle", bio: "2022 Olympic silver medalist in slopestyle, X Games champion.", photo: null },
+                { id: "a29", name: "Dusty Henricksen", country: "USA", countryFlag: "🇺🇸", sport: "snowboard", discipline: "Slopestyle/Big Air", bio: "Young phenom, X Games gold medalist, known for creative style.", photo: null },
+
+                // USA Freestyle Skiing
+                { id: "a30", name: "Alex Hall", country: "USA", countryFlag: "🇺🇸", sport: "freestyle", discipline: "Slopestyle", bio: "2022 Olympic gold medalist in slopestyle, known for technical difficulty.", photo: null },
+                { id: "a31", name: "David Wise", country: "USA", countryFlag: "🇺🇸", sport: "freestyle", discipline: "Halfpipe", bio: "Two-time Olympic gold medalist in halfpipe (2014, 2018).", photo: null },
+                { id: "a32", name: "Jaelin Kauf", country: "USA", countryFlag: "🇺🇸", sport: "freestyle", discipline: "Moguls", bio: "2022 Olympic silver medalist in moguls, World Cup champion.", photo: null },
+
+                // USA Speed Skating
+                { id: "a8", name: "Erin Jackson", country: "USA", countryFlag: "🇺🇸", sport: "speed-skating", discipline: "500m", bio: "2022 Olympic gold medalist, first Black woman to win individual Winter Olympic medal in speed skating.", photo: null },
+                { id: "a33", name: "Brittany Bowe", country: "USA", countryFlag: "🇺🇸", sport: "speed-skating", discipline: "1000m/1500m", bio: "Multiple World Champion, 2022 Olympic bronze medalist.", photo: null },
+                { id: "a34", name: "Joey Mantia", country: "USA", countryFlag: "🇺🇸", sport: "speed-skating", discipline: "Mass Start/1500m", bio: "World Champion in mass start, former inline skating legend.", photo: null },
+
+                // USA Short Track
+                { id: "a35", name: "Ryan Pivirotto", country: "USA", countryFlag: "🇺🇸", sport: "short-track", discipline: "All Events", bio: "US National Champion, emerging talent in short track.", photo: null },
+                { id: "a36", name: "Kristen Santos-Griswold", country: "USA", countryFlag: "🇺🇸", sport: "short-track", discipline: "1000m/1500m", bio: "Multiple World Championship medalist, Olympic finalist.", photo: null },
+
+                // USA Cross-Country
+                { id: "a37", name: "Jessie Diggins", country: "USA", countryFlag: "🇺🇸", sport: "cross-country", discipline: "All Events", bio: "2018 Olympic gold medalist (team sprint), first American woman to win Olympic gold in cross-country. 2022 bronze medalist.", photo: null },
+
+                // USA Bobsled/Skeleton
+                { id: "a9", name: "Kaillie Humphries", country: "USA", countryFlag: "🇺🇸", sport: "bobsled", discipline: "Monobob/Two-Woman", bio: "Four-time Olympic medalist including 2022 monobob gold, dominant force in women's bobsled.", photo: null },
+                { id: "a38", name: "Elana Meyers Taylor", country: "USA", countryFlag: "🇺🇸", sport: "bobsled", discipline: "Two-Woman/Monobob", bio: "Five-time Olympic medalist, most decorated US bobsledder ever.", photo: null },
+
+                // USA Luge
+                { id: "a39", name: "Summer Britcher", country: "USA", countryFlag: "🇺🇸", sport: "luge", discipline: "Women's Singles", bio: "Multiple World Cup medalist, top US women's luger.", photo: null },
+
+                // USA Hockey
+                { id: "a10", name: "Hilary Knight", country: "USA", countryFlag: "🇺🇸", sport: "hockey", discipline: "Women's", bio: "All-time leading scorer for USA women's hockey, four-time Olympic medalist.", photo: null },
+                { id: "a40", name: "Kendall Coyne Schofield", country: "USA", countryFlag: "🇺🇸", sport: "hockey", discipline: "Women's", bio: "Olympic gold medalist, known for record-breaking speed at NHL All-Star Skills.", photo: null },
+
+                // USA Curling
+                { id: "a41", name: "John Shuster", country: "USA", countryFlag: "🇺🇸", sport: "curling", discipline: "Men's Skip", bio: "2018 Olympic gold medalist, led historic US men's curling victory.", photo: null },
+                { id: "a42", name: "Tabitha Peterson", country: "USA", countryFlag: "🇺🇸", sport: "curling", discipline: "Women's Skip", bio: "US women's curling team skip, World Championship competitor.", photo: null },
+
+                // USA Biathlon
+                { id: "a43", name: "Deedra Irwin", country: "USA", countryFlag: "🇺🇸", sport: "biathlon", discipline: "All Events", bio: "First US woman to win a World Cup biathlon medal, rising star.", photo: null },
+
+                // Norway
+                { id: "a11", name: "Johannes Thingnes Bø", country: "Norway", countryFlag: "🇳🇴", sport: "biathlon", discipline: "All Events", bio: "Most decorated biathlete of all time.", photo: null },
+                { id: "a12", name: "Therese Johaug", country: "Norway", countryFlag: "🇳🇴", sport: "cross-country", discipline: "Distance", bio: "Multiple Olympic and World Champion in cross-country.", photo: null },
+
+                // Switzerland
+                { id: "a13", name: "Marco Odermatt", country: "Switzerland", countryFlag: "🇨🇭", sport: "alpine", discipline: "Giant Slalom/Super-G", bio: "Dominant force in alpine skiing, multiple Crystal Globes.", photo: null },
+
+                // Japan
+                { id: "a14", name: "Yuzuru Hanyu", country: "Japan", countryFlag: "🇯🇵", sport: "figure-skating", discipline: "Men's Singles", bio: "Two-time Olympic champion (retired, possible exhibition).", photo: null },
+                { id: "a15", name: "Ayumu Hirano", country: "Japan", countryFlag: "🇯🇵", sport: "snowboard", discipline: "Halfpipe", bio: "Olympic gold medalist known for triple corks.", photo: null },
+
+                // Canada
+                { id: "a16", name: "Mark McMorris", country: "Canada", countryFlag: "🇨🇦", sport: "snowboard", discipline: "Slopestyle/Big Air", bio: "Multiple X Games gold medalist, Olympic bronze.", photo: null },
+
+                // Netherlands
+                { id: "a17", name: "Ireen Wüst", country: "Netherlands", countryFlag: "🇳🇱", sport: "speed-skating", discipline: "All Distances", bio: "Most decorated Olympic speed skater ever (retired, ambassador).", photo: null },
+
+                // Italy (Host Nation)
+                { id: "a18", name: "Sofia Goggia", country: "Italy", countryFlag: "🇮🇹", sport: "alpine", discipline: "Downhill", bio: "Olympic champion and multiple World Cup winner from host nation.", photo: null },
+                { id: "a19", name: "Federica Brignone", country: "Italy", countryFlag: "🇮🇹", sport: "alpine", discipline: "Giant Slalom/Combined", bio: "First Italian woman to win overall World Cup.", photo: null },
+                { id: "a20", name: "Dorothea Wierer", country: "Italy", countryFlag: "🇮🇹", sport: "biathlon", discipline: "All Events", bio: "Two-time overall World Cup champion in biathlon.", photo: null }
+            ],
+
+            // Medal Standings (will update during games)
+            medals: [
+                { country: "Norway", flag: "🇳🇴", gold: 0, silver: 0, bronze: 0 },
+                { country: "USA", flag: "🇺🇸", gold: 0, silver: 0, bronze: 0 },
+                { country: "Germany", flag: "🇩🇪", gold: 0, silver: 0, bronze: 0 },
+                { country: "Canada", flag: "🇨🇦", gold: 0, silver: 0, bronze: 0 },
+                { country: "Italy", flag: "🇮🇹", gold: 0, silver: 0, bronze: 0 },
+                { country: "Switzerland", flag: "🇨🇭", gold: 0, silver: 0, bronze: 0 },
+                { country: "Austria", flag: "🇦🇹", gold: 0, silver: 0, bronze: 0 },
+                { country: "Sweden", flag: "🇸🇪", gold: 0, silver: 0, bronze: 0 },
+                { country: "Japan", flag: "🇯🇵", gold: 0, silver: 0, bronze: 0 },
+                { country: "Netherlands", flag: "🇳🇱", gold: 0, silver: 0, bronze: 0 },
+                { country: "France", flag: "🇫🇷", gold: 0, silver: 0, bronze: 0 },
+                { country: "China", flag: "🇨🇳", gold: 0, silver: 0, bronze: 0 },
+                { country: "South Korea", flag: "🇰🇷", gold: 0, silver: 0, bronze: 0 },
+                { country: "Finland", flag: "🇫🇮", gold: 0, silver: 0, bronze: 0 },
+                { country: "Russia (OC)", flag: "🏳️", gold: 0, silver: 0, bronze: 0 }
+            ],
+
+            // User favorites (synced via iCloud)
+            favorites: {
+                events: [],
+                athletes: []
+            }
+        };
+
+        // ========================================
+        // APP STATE
+        // ========================================
+        let state = {
+            currentTab: 'scheduleTab',
+            selectedDate: '2026-02-04',
+            selectedSport: 'all',
+            selectedCountry: 'all',
+            athleteSearch: '',
+            data: JSON.parse(JSON.stringify(OlympicsData))
+        };
+
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+        function init() {
+            loadFromStorage();
+            setupNavigation();
+            setupDatePicker();
+            setupSportFilters();
+            setupCountryFilters();
+            setupSearch();
+            updateCountdown();
+            renderAll();
+
+            // Update countdown every minute
+            setInterval(updateCountdown, 60000);
+        }
+
+        // ========================================
+        // STORAGE (iCloud via localStorage for now)
+        // ========================================
+        function loadFromStorage() {
+            try {
+                const saved = localStorage.getItem('olympics2026_favorites');
+                if (saved) {
+                    state.data.favorites = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.log('Could not load favorites:', e);
+            }
+        }
+
+        function saveToStorage() {
+            try {
+                localStorage.setItem('olympics2026_favorites', JSON.stringify(state.data.favorites));
+                updateSyncStatus('Saved');
+                setTimeout(() => updateSyncStatus('Synced'), 1000);
+            } catch (e) {
+                console.log('Could not save favorites:', e);
+                updateSyncStatus('Error');
+            }
+        }
+
+        function updateSyncStatus(status) {
+            document.getElementById('syncStatus').textContent = status;
+        }
+
+        // ========================================
+        // NAVIGATION
+        // ========================================
+        function setupNavigation() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabId = item.dataset.tab;
+                    switchTab(tabId);
+                });
+            });
+        }
+
+        function switchTab(tabId) {
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.tab === tabId);
+            });
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.toggle('active', tab.id === tabId);
+            });
+
+            state.currentTab = tabId;
+
+            // Re-render current tab
+            if (tabId === 'favoritesTab') {
+                renderFavorites();
+            }
+        }
+
+        // ========================================
+        // DATE PICKER
+        // ========================================
+        function setupDatePicker() {
+            const container = document.getElementById('datePicker');
+            const startDate = new Date('2026-02-04'); // Prelim events start Feb 4
+            const endDate = new Date('2026-02-22');
+
+            // Get dates that have events and medal events for the selected sport
+            const datesWithEvents = new Set();
+            const datesWithMedals = new Set();
+            state.data.events.forEach(event => {
+                if (state.selectedSport === 'all' || event.sport === state.selectedSport) {
+                    datesWithEvents.add(event.date);
+                    if (event.medal) {
+                        datesWithMedals.add(event.date);
+                    }
+                }
+            });
+
+            let html = '';
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+                const dayNum = d.getDate();
+                const isActive = dateStr === state.selectedDate;
+                const hasEvents = state.selectedSport !== 'all' && datesWithEvents.has(dateStr);
+                const hasMedals = state.selectedSport !== 'all' && datesWithMedals.has(dateStr);
+
+                let classes = 'date-item';
+                if (isActive) classes += ' active';
+                if (hasEvents) classes += ' has-events';
+                if (hasMedals) classes += ' has-medal';
+
+                html += `
+                    <div class="${classes}" data-date="${dateStr}">
+                        <span class="date-day">${dayName}</span>
+                        <span class="date-num">${dayNum}</span>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            // Event listeners
+            container.querySelectorAll('.date-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    state.selectedDate = item.dataset.date;
+                    setupDatePicker();
+                    renderEvents();
+                });
+            });
+        }
+
+        // ========================================
+        // SPORT FILTERS
+        // ========================================
+        function setupSportFilters() {
+            const container = document.getElementById('sportFilters');
+
+            let html = `<div class="filter-chip ${state.selectedSport === 'all' ? 'active' : ''}" data-sport="all">All Sports</div>`;
+
+            state.data.sports.forEach(sport => {
+                const isActive = state.selectedSport === sport.id;
+                html += `<div class="filter-chip ${isActive ? 'active' : ''}" data-sport="${sport.id}">${sport.emoji} ${sport.name}</div>`;
+            });
+
+            container.innerHTML = html;
+
+            // Event listeners
+            container.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    state.selectedSport = chip.dataset.sport;
+                    setupSportFilters();
+                    setupDatePicker(); // Update date indicators for selected sport
+                    renderEvents();
+                });
+            });
+        }
+
+        // ========================================
+        // COUNTRY FILTERS
+        // ========================================
+        function setupCountryFilters() {
+            const container = document.getElementById('countryFilters');
+            const countries = [...new Set(state.data.athletes.map(a => a.country))].sort();
+
+            let html = `<div class="filter-chip ${state.selectedCountry === 'all' ? 'active' : ''}" data-country="all">All Countries</div>`;
+
+            countries.forEach(country => {
+                const athlete = state.data.athletes.find(a => a.country === country);
+                const isActive = state.selectedCountry === country;
+                html += `<div class="filter-chip ${isActive ? 'active' : ''}" data-country="${country}">${athlete.countryFlag} ${country}</div>`;
+            });
+
+            container.innerHTML = html;
+
+            // Event listeners
+            container.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    state.selectedCountry = chip.dataset.country;
+                    setupCountryFilters();
+                    renderAthletes();
+                });
+            });
+        }
+
+        // ========================================
+        // SEARCH
+        // ========================================
+        function setupSearch() {
+            const input = document.getElementById('athleteSearch');
+            input.addEventListener('input', (e) => {
+                state.athleteSearch = e.target.value.toLowerCase();
+                renderAthletes();
+            });
+        }
+
+        // ========================================
+        // COUNTDOWN
+        // ========================================
+        function updateCountdown() {
+            const olympicsStart = new Date('2026-02-06T20:00:00+01:00');
+            const now = new Date();
+            const diff = olympicsStart - now;
+
+            if (diff <= 0) {
+                document.getElementById('countdownCard').innerHTML = `
+                    <div class="countdown-title">🎉 The Games Are On!</div>
+                `;
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+            document.getElementById('countDays').textContent = days;
+            document.getElementById('countHours').textContent = hours;
+            document.getElementById('countMins').textContent = mins;
+        }
+
+        // ========================================
+        // RENDER FUNCTIONS
+        // ========================================
+        function renderAll() {
+            renderEvents();
+            renderMedals();
+            renderAthletes();
+            renderFavorites();
+        }
+
+        function renderEvents() {
+            const container = document.getElementById('eventsList');
+
+            let events = state.data.events.filter(e => e.date === state.selectedDate);
+
+            if (state.selectedSport !== 'all') {
+                events = events.filter(e => e.sport === state.selectedSport);
+            }
+
+            if (events.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        <div style="font-size: 48px; margin-bottom: 12px;">📅</div>
+                        <p>No events scheduled for this day${state.selectedSport !== 'all' ? ' in this sport' : ''}.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            events.sort((a, b) => a.time.localeCompare(b.time));
+
+            let html = '';
+            events.forEach(event => {
+                const sport = state.data.sports.find(s => s.id === event.sport) || { emoji: '🏆', name: event.sport };
+                const isFavorite = state.data.favorites.events.includes(event.id);
+                const [hour, min] = event.time.split(':');
+                const hourNum = parseInt(hour);
+                const period = hourNum >= 12 ? 'PM' : 'AM';
+                const displayHour = hourNum > 12 ? hourNum - 12 : (hourNum === 0 ? 12 : hourNum);
+
+                html += `
+                    <div class="event-item" onclick="showEventDetail('${event.id}')">
+                        <div class="event-time">
+                            <span class="event-hour">${displayHour}:${min}</span>
+                            <span class="event-period">${period}</span>
+                        </div>
+                        <div class="event-details">
+                            <div class="event-sport">${sport.emoji} ${sport.name}</div>
+                            <div class="event-name">${event.name}</div>
+                            <div class="event-venue">📍 ${event.venue}</div>
+                        </div>
+                        <div class="event-favorite ${isFavorite ? 'active' : ''}" onclick="toggleEventFavorite(event, '${event.id}')">
+                            ${isFavorite ? '⭐' : '☆'}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderMedals() {
+            const tbody = document.getElementById('medalTable');
+
+            // Sort by gold, then silver, then bronze
+            const sorted = [...state.data.medals].sort((a, b) => {
+                if (b.gold !== a.gold) return b.gold - a.gold;
+                if (b.silver !== a.silver) return b.silver - a.silver;
+                return b.bronze - a.bronze;
+            });
+
+            let totalGold = 0;
+            let totalMedals = 0;
+
+            let html = '';
+            sorted.forEach((country, i) => {
+                const total = country.gold + country.silver + country.bronze;
+                totalGold += country.gold;
+                totalMedals += total;
+
+                html += `
+                    <tr>
+                        <td>
+                            <div class="country-cell">
+                                <span class="country-flag">${country.flag}</span>
+                                <span class="country-name">${country.country}</span>
+                            </div>
+                        </td>
+                        <td><span class="medal-count medal-gold">${country.gold}</span></td>
+                        <td><span class="medal-count medal-silver">${country.silver}</span></td>
+                        <td><span class="medal-count medal-bronze">${country.bronze}</span></td>
+                        <td><span class="total-count">${total}</span></td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+            document.getElementById('totalGold').textContent = totalGold;
+            document.getElementById('totalMedals').textContent = totalMedals;
+        }
+
+        function renderAthletes() {
+            const container = document.getElementById('athleteGrid');
+
+            let athletes = [...state.data.athletes];
+
+            // Filter by country
+            if (state.selectedCountry !== 'all') {
+                athletes = athletes.filter(a => a.country === state.selectedCountry);
+            }
+
+            // Filter by search
+            if (state.athleteSearch) {
+                athletes = athletes.filter(a =>
+                    a.name.toLowerCase().includes(state.athleteSearch) ||
+                    a.sport.toLowerCase().includes(state.athleteSearch) ||
+                    a.country.toLowerCase().includes(state.athleteSearch)
+                );
+            }
+
+            if (athletes.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted); grid-column: 1/-1;">
+                        <div style="font-size: 48px; margin-bottom: 12px;">👤</div>
+                        <p>No athletes found.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            athletes.forEach(athlete => {
+                const sport = state.data.sports.find(s => s.id === athlete.sport);
+                const sportEmoji = sport ? sport.emoji : '🏆';
+                const initials = athlete.name.split(' ').map(n => n[0]).join('');
+
+                html += `
+                    <div class="athlete-card" onclick="showAthleteDetail('${athlete.id}')">
+                        <div class="athlete-photo">
+                            ${athlete.photo ? `<img src="${athlete.photo}" alt="${athlete.name}">` : initials}
+                        </div>
+                        <div class="athlete-info">
+                            <div class="athlete-name">${athlete.name}</div>
+                            <div class="athlete-country">${athlete.countryFlag} ${athlete.country}</div>
+                            <div class="athlete-sport">${sportEmoji} ${athlete.discipline}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderFavorites() {
+            const eventsContainer = document.getElementById('favoriteEventsList');
+            const athletesContainer = document.getElementById('favoriteAthletesList');
+            const emptyState = document.getElementById('favoritesEmpty');
+
+            const favoriteEvents = state.data.events.filter(e => state.data.favorites.events.includes(e.id));
+            const favoriteAthletes = state.data.athletes.filter(a => state.data.favorites.athletes.includes(a.id));
+
+            if (favoriteEvents.length === 0 && favoriteAthletes.length === 0) {
+                document.getElementById('favoriteEvents').style.display = 'none';
+                document.getElementById('favoriteAthletes').style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            // Render favorite events
+            if (favoriteEvents.length > 0) {
+                document.getElementById('favoriteEvents').style.display = 'block';
+                let html = '';
+                favoriteEvents.sort((a, b) => {
+                    if (a.date !== b.date) return a.date.localeCompare(b.date);
+                    return a.time.localeCompare(b.time);
+                });
+
+                favoriteEvents.forEach(event => {
+                    const sport = state.data.sports.find(s => s.id === event.sport) || { emoji: '🏆', name: event.sport };
+                    const [hour, min] = event.time.split(':');
+                    const hourNum = parseInt(hour);
+                    const period = hourNum >= 12 ? 'PM' : 'AM';
+                    const displayHour = hourNum > 12 ? hourNum - 12 : (hourNum === 0 ? 12 : hourNum);
+                    const dateObj = new Date(event.date + 'T00:00:00');
+                    const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                    html += `
+                        <div class="event-item" onclick="showEventDetail('${event.id}')">
+                            <div class="event-time">
+                                <span class="event-hour">${displayHour}:${min}</span>
+                                <span class="event-period">${period}</span>
+                            </div>
+                            <div class="event-details">
+                                <div class="event-sport">${sport.emoji} ${sport.name} • ${dateStr}</div>
+                                <div class="event-name">${event.name}</div>
+                                <div class="event-venue">📍 ${event.venue}</div>
+                            </div>
+                            <div class="event-favorite active" onclick="toggleEventFavorite(event, '${event.id}')">⭐</div>
+                        </div>
+                    `;
+                });
+
+                eventsContainer.innerHTML = html;
+            } else {
+                document.getElementById('favoriteEvents').style.display = 'none';
+            }
+
+            // Render favorite athletes
+            if (favoriteAthletes.length > 0) {
+                document.getElementById('favoriteAthletes').style.display = 'block';
+                let html = '';
+                favoriteAthletes.forEach(athlete => {
+                    const sport = state.data.sports.find(s => s.id === athlete.sport);
+                    const sportEmoji = sport ? sport.emoji : '🏆';
+                    const initials = athlete.name.split(' ').map(n => n[0]).join('');
+
+                    html += `
+                        <div class="athlete-card" onclick="showAthleteDetail('${athlete.id}')">
+                            <div class="athlete-photo">
+                                ${athlete.photo ? `<img src="${athlete.photo}" alt="${athlete.name}">` : initials}
+                            </div>
+                            <div class="athlete-info">
+                                <div class="athlete-name">${athlete.name}</div>
+                                <div class="athlete-country">${athlete.countryFlag} ${athlete.country}</div>
+                                <div class="athlete-sport">${sportEmoji} ${athlete.discipline}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                athletesContainer.innerHTML = html;
+            } else {
+                document.getElementById('favoriteAthletes').style.display = 'none';
+            }
+        }
+
+        // ========================================
+        // FAVORITES
+        // ========================================
+        function toggleEventFavorite(e, eventId) {
+            e.stopPropagation();
+            const index = state.data.favorites.events.indexOf(eventId);
+            if (index > -1) {
+                state.data.favorites.events.splice(index, 1);
+            } else {
+                state.data.favorites.events.push(eventId);
+            }
+            saveToStorage();
+            renderEvents();
+            renderFavorites();
+        }
+
+        function toggleAthleteFavorite(e, athleteId) {
+            e.stopPropagation();
+            const index = state.data.favorites.athletes.indexOf(athleteId);
+            if (index > -1) {
+                state.data.favorites.athletes.splice(index, 1);
+            } else {
+                state.data.favorites.athletes.push(athleteId);
+            }
+            saveToStorage();
+            renderAthletes();
+            renderFavorites();
+        }
+
+        // ========================================
+        // MODALS
+        // ========================================
+        function showEventDetail(eventId) {
+            const event = state.data.events.find(e => e.id === eventId);
+            if (!event) return;
+
+            const sport = state.data.sports.find(s => s.id === event.sport) || { emoji: '🏆', name: event.sport };
+            const isFavorite = state.data.favorites.events.includes(event.id);
+            const dateObj = new Date(event.date + 'T00:00:00');
+            const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            const [hour, min] = event.time.split(':');
+            const hourNum = parseInt(hour);
+            const period = hourNum >= 12 ? 'PM' : 'AM';
+            const displayHour = hourNum > 12 ? hourNum - 12 : (hourNum === 0 ? 12 : hourNum);
+
+            // Build teams/countries section
+            let teamsHtml = '';
+            if (event.teams && event.teams.length > 0) {
+                teamsHtml = `
+                    <div style="background: var(--bg); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                        <div style="font-weight: 600; margin-bottom: 8px;">🏳️ Teams / Countries</div>
+                        <div style="color: var(--text-muted); line-height: 1.6;">
+                            ${event.teams.map(t => `<div>${t}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Build result section (for completed events)
+            let resultHtml = '';
+            if (event.status === 'completed' && event.result) {
+                resultHtml = `
+                    <div style="background: linear-gradient(135deg, var(--gold), #FFA500); border-radius: 12px; padding: 16px; margin-bottom: 16px; color: #333;">
+                        <div style="font-weight: 600; margin-bottom: 8px;">🏆 Result</div>
+                        <div style="font-size: 16px; font-weight: 500;">${event.result}</div>
+                    </div>
+                `;
+            }
+
+            // Build links section
+            let linksHtml = '';
+            if (event.liveUrl || event.highlightsUrl) {
+                linksHtml = `<div style="display: flex; gap: 8px; margin-bottom: 16px;">`;
+                if (event.status === 'live' && event.liveUrl) {
+                    linksHtml += `
+                        <a href="${event.liveUrl}" target="_blank" style="flex: 1; padding: 12px; border-radius: 12px; background: var(--accent); color: white; text-decoration: none; text-align: center; font-weight: 600;">
+                            📺 Watch Live
+                        </a>
+                    `;
+                }
+                if (event.status === 'completed' && event.highlightsUrl) {
+                    linksHtml += `
+                        <a href="${event.highlightsUrl}" target="_blank" style="flex: 1; padding: 12px; border-radius: 12px; background: var(--primary); color: white; text-decoration: none; text-align: center; font-weight: 600;">
+                            🎬 Highlights
+                        </a>
+                    `;
+                }
+                linksHtml += `</div>`;
+            }
+
+            // Status badge
+            let statusBadge = '';
+            if (event.status === 'live') {
+                statusBadge = `<span style="background: var(--accent); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; animation: pulse 2s infinite;">🔴 LIVE</span>`;
+            } else if (event.status === 'completed') {
+                statusBadge = `<span style="background: var(--success); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">✓ COMPLETED</span>`;
+            } else if (event.medal) {
+                statusBadge = `<span style="background: linear-gradient(135deg, var(--gold), #FFA500); color: #333; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">🏅 MEDAL EVENT</span>`;
+            }
+
+            document.getElementById('eventModalBody').innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 48px; margin-bottom: 8px;">${sport.emoji}</div>
+                    <div style="font-size: 14px; color: var(--primary); font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">${sport.name}</div>
+                    ${statusBadge}
+                </div>
+                <h2 style="text-align: center; margin-bottom: 20px;">${event.name}</h2>
+                ${resultHtml}
+                <div style="background: var(--bg); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: var(--text-muted);">Date</span>
+                        <span style="font-weight: 500;">${dateStr}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: var(--text-muted);">Time</span>
+                        <span style="font-weight: 500;">${displayHour}:${min} ${period} (Local)</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Venue</span>
+                        <span style="font-weight: 500;">📍 ${event.venue}</span>
+                    </div>
+                </div>
+                ${teamsHtml}
+                ${linksHtml}
+                <button onclick="toggleEventFavorite(event, '${event.id}'); showEventDetail('${event.id}');"
+                        style="width: 100%; padding: 14px; border-radius: 12px; border: none;
+                               background: ${isFavorite ? 'var(--bg)' : 'var(--primary)'};
+                               color: ${isFavorite ? 'var(--text)' : 'white'};
+                               font-weight: 600; font-size: 16px; cursor: pointer;">
+                    ${isFavorite ? '⭐ Remove from Favorites' : '☆ Add to Favorites'}
+                </button>
+            `;
+
+            document.getElementById('eventModal').classList.add('active');
+        }
+
+        function showAthleteDetail(athleteId) {
+            const athlete = state.data.athletes.find(a => a.id === athleteId);
+            if (!athlete) return;
+
+            const sport = state.data.sports.find(s => s.id === athlete.sport);
+            const sportEmoji = sport ? sport.emoji : '🏆';
+            const isFavorite = state.data.favorites.athletes.includes(athlete.id);
+            const initials = athlete.name.split(' ').map(n => n[0]).join('');
+
+            document.getElementById('athleteModalBody').innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+                                display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 40px; color: white;">
+                        ${athlete.photo ? `<img src="${athlete.photo}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : initials}
+                    </div>
+                    <h2 style="margin-bottom: 4px;">${athlete.name}</h2>
+                    <div style="color: var(--text-muted);">${athlete.countryFlag} ${athlete.country}</div>
+                </div>
+                <div style="background: var(--bg); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: var(--text-muted);">Sport</span>
+                        <span style="font-weight: 500;">${sportEmoji} ${sport ? sport.name : athlete.sport}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Discipline</span>
+                        <span style="font-weight: 500;">${athlete.discipline}</span>
+                    </div>
+                </div>
+                <div style="background: var(--bg); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                    <div style="font-weight: 600; margin-bottom: 8px;">About</div>
+                    <p style="color: var(--text-muted); line-height: 1.5;">${athlete.bio}</p>
+                </div>
+                <button onclick="toggleAthleteFavorite(event, '${athlete.id}'); showAthleteDetail('${athlete.id}');"
+                        style="width: 100%; padding: 14px; border-radius: 12px; border: none;
+                               background: ${isFavorite ? 'var(--bg)' : 'var(--primary)'};
+                               color: ${isFavorite ? 'var(--text)' : 'white'};
+                               font-weight: 600; font-size: 16px; cursor: pointer;">
+                    ${isFavorite ? '⭐ Remove from Favorites' : '☆ Add to Favorites'}
+                </button>
+            `;
+
+            document.getElementById('athleteModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
