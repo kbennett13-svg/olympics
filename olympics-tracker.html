@@ -406,6 +406,50 @@
             color: var(--gold);
         }
 
+        /* Enhanced Event Cards */
+        .event-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .event-teams {
+            font-size: 13px;
+            color: var(--text);
+            margin: 6px 0;
+            padding: 6px 10px;
+            background: var(--bg);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .event-teams .winner {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .event-result-preview {
+            font-size: 13px;
+            color: var(--success);
+            font-weight: 600;
+            margin: 4px 0;
+        }
+
+        .event-item.completed {
+            border-left: 4px solid var(--success);
+        }
+
+        .event-item.live {
+            border-left: 4px solid var(--accent);
+            background: linear-gradient(90deg, rgba(230, 57, 70, 0.05) 0%, var(--card) 100%);
+        }
+
+        .event-item.upcoming {
+            border-left: 4px solid var(--border);
+        }
+
         /* Medal Table */
         .medal-table {
             width: 100%;
@@ -1478,15 +1522,57 @@
                 const period = hourNum >= 12 ? 'PM' : 'AM';
                 const displayHour = hourNum > 12 ? hourNum - 12 : (hourNum === 0 ? 12 : hourNum);
 
+                // Build status badge
+                let statusBadge = '';
+                if (event.status === 'live') {
+                    statusBadge = '<span class="event-status live">🔴 LIVE</span>';
+                } else if (event.status === 'completed') {
+                    statusBadge = '<span class="event-status completed">✓ FINAL</span>';
+                } else {
+                    statusBadge = '<span class="event-status upcoming">UPCOMING</span>';
+                }
+
+                // Build teams/matchup display
+                let teamsHtml = '';
+                if (event.teams && event.teams.length > 0) {
+                    if (event.status === 'completed' && event.result) {
+                        // Show winner highlighted
+                        const winnerMatch = event.result.match(/^(�[^\s]+)\s*([A-Za-z]+)\s+wins?/i);
+                        if (winnerMatch) {
+                            const winnerFlag = winnerMatch[1];
+                            teamsHtml = `<div class="event-teams"><span class="winner">${event.result.split(' - ')[0]}</span></div>`;
+                        } else {
+                            teamsHtml = `<div class="event-teams">${event.teams.join(' • ')}</div>`;
+                        }
+                    } else {
+                        teamsHtml = `<div class="event-teams">${event.teams.join(' • ')}</div>`;
+                    }
+                }
+
+                // Build result snippet for completed events
+                let resultHtml = '';
+                if (event.status === 'completed' && event.result) {
+                    // Extract just the score part if possible
+                    const scoreMatch = event.result.match(/(\d+-\d+|\d+\.\d+)/);
+                    if (scoreMatch && !teamsHtml.includes('wins')) {
+                        resultHtml = `<div class="event-result-preview">${event.result.split(' - ')[0]}</div>`;
+                    }
+                }
+
                 html += `
-                    <div class="event-item" onclick="showEventDetail('${event.id}')">
+                    <div class="event-item ${event.status}" onclick="showEventDetail('${event.id}')">
                         <div class="event-time">
                             <span class="event-hour">${displayHour}:${min}</span>
                             <span class="event-period">${period}</span>
                         </div>
                         <div class="event-details">
-                            <div class="event-sport">${sport.emoji} ${sport.name}</div>
+                            <div class="event-header-row">
+                                <div class="event-sport">${sport.emoji} ${sport.name}</div>
+                                ${statusBadge}
+                            </div>
                             <div class="event-name">${event.name}</div>
+                            ${teamsHtml}
+                            ${resultHtml}
                             <div class="event-venue">📍 ${event.venue}</div>
                         </div>
                         <div class="event-favorite ${isFavorite ? 'active' : ''}" onclick="toggleEventFavorite(event, '${event.id}')">
