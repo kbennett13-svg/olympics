@@ -817,7 +817,7 @@
     </style>
 </head>
 <body>
-    <!-- Header - Last updated: 2026-02-04 9:00 PM ET - Day 1 Complete! -->
+    <!-- Header - Last updated: 2026-02-05 2:00 PM ET - Day 2 in progress! -->
     <header class="header">
         <div class="header-content">
             <div class="logo">
@@ -1026,15 +1026,22 @@
                 { id: "p11", date: "2026-02-04", time: "18:30", sport: "luge", name: "Men's Singles - Official Training", venue: "Cortina Sliding Centre", status: "completed", result: "⚠️ Brief power outage paused training" },
                 { id: "p12", date: "2026-02-04", time: "19:00", sport: "snowboard", name: "Big Air Training", venue: "Livigno Snow Park", status: "completed", result: "⚠️ Mark McMorris (CAN) stretchered off after crash" },
 
-                // Feb 5 - Preliminary Events (Day 2)
-                { id: "p2", date: "2026-02-05", time: "04:05", sport: "curling", name: "Mixed Doubles Round Robin - Draw 2", venue: "Cortina Olympic Centre", status: "upcoming", teams: ["🇬🇧 GB vs 🇪🇪 Estonia", "🇸🇪 Sweden vs 🇨🇿 Czechia", "🇳🇴 Norway vs 🇨🇦 Canada"] },
-                { id: "p4", date: "2026-02-05", time: "09:05", sport: "curling", name: "Mixed Doubles Round Robin - Draw 3", venue: "Cortina Olympic Centre", status: "upcoming", teams: ["🇮🇹 Italy vs 🇰🇷 South Korea", "🇨🇭 Switzerland vs 🇭🇺 Hungary"] },
-                { id: "p5", date: "2026-02-05", time: "14:05", sport: "curling", name: "Mixed Doubles Round Robin - Draw 4", venue: "Cortina Olympic Centre", status: "upcoming" },
-                { id: "p13", date: "2026-02-05", time: "19:00", sport: "snowboard", name: "Big Air Qualifying", venue: "Livigno Snow Park", status: "upcoming" },
-                { id: "p14", date: "2026-02-05", time: "10:00", sport: "alpine", name: "Women's Downhill Training", venue: "Cortina", status: "upcoming", result: "⚠️ CANCELLED - Poor weather" },
-                { id: "p7", date: "2026-02-05", time: "12:00", sport: "hockey", name: "Women's Preliminary - Group A", venue: "PalaItalia Santa Giulia", status: "upcoming", teams: ["🇺🇸 USA vs 🇫🇮 Finland"] },
-                { id: "p8", date: "2026-02-05", time: "16:30", sport: "hockey", name: "Women's Preliminary - Group B", venue: "PalaItalia Santa Giulia", status: "upcoming", teams: ["🇨🇦 Canada vs 🇸🇪 Sweden"] },
-                { id: "p9", date: "2026-02-05", time: "21:00", sport: "hockey", name: "Women's Preliminary - Group A", venue: "PalaItalia Santa Giulia", status: "upcoming", teams: ["🇨🇭 Switzerland vs 🇯🇵 Japan"] },
+                // Feb 5 - Preliminary Events (Day 2) - RESULTS UPDATED
+                // Draw 2 Results
+                { id: "p2a", date: "2026-02-05", time: "04:05", sport: "curling", name: "Mixed Doubles: USA vs Norway", venue: "Cortina Olympic Centre", status: "completed", teams: ["🇺🇸 USA", "🇳🇴 Norway"], result: "🇺🇸 USA wins 8-6 - Thiesse/Dropkin comeback victory!" },
+                { id: "p2b", date: "2026-02-05", time: "04:05", sport: "curling", name: "Mixed Doubles: Great Britain vs Estonia", venue: "Cortina Olympic Centre", status: "completed", teams: ["🇬🇧 Great Britain", "🇪🇪 Estonia"], result: "🇬🇧 GB wins 10-5" },
+                { id: "p2c", date: "2026-02-05", time: "04:05", sport: "curling", name: "Mixed Doubles: Sweden vs Czechia", venue: "Cortina Olympic Centre", status: "completed", teams: ["🇸🇪 Sweden", "🇨🇿 Czechia"], result: "🇸🇪 Sweden wins 7-4" },
+                { id: "p2d", date: "2026-02-05", time: "04:05", sport: "curling", name: "Mixed Doubles: Italy vs South Korea", venue: "Cortina Olympic Centre", status: "completed", teams: ["🇮🇹 Italy", "🇰🇷 South Korea"], result: "🇮🇹 Italy wins 8-4 (7 ends) - Defending champs dominant!" },
+                // Draw 3 Results
+                { id: "p4a", date: "2026-02-05", time: "09:05", sport: "curling", name: "Mixed Doubles: USA vs Switzerland", venue: "Cortina Olympic Centre", status: "completed", teams: ["🇺🇸 USA", "🇨🇭 Switzerland"], result: "🇺🇸 USA wins 7-4 - USA now 2-0!" },
+                { id: "p4b", date: "2026-02-05", time: "09:05", sport: "curling", name: "Mixed Doubles: Canada vs Norway", venue: "Cortina Olympic Centre", status: "completed", teams: ["🇨🇦 Canada", "🇳🇴 Norway"], result: "🇨🇦 Canada wins 6-3 - Norway falls to 0-3" },
+                { id: "p5", date: "2026-02-05", time: "14:05", sport: "curling", name: "Mixed Doubles Round Robin - Draw 4", venue: "Cortina Olympic Centre", status: "live", teams: ["🇬🇧 GB vs 🇨🇿 Czechia", "🇪🇪 Estonia vs 🇸🇪 Sweden", "🇨🇭 Switzerland vs 🇰🇷 South Korea", "🇨🇦 Canada vs 🇮🇹 Italy"] },
+                { id: "p13", date: "2026-02-05", time: "19:00", sport: "snowboard", name: "Big Air Qualifying", venue: "Livigno Snow Park", status: "upcoming", result: "⚠️ McMorris OUT - shifted focus to slopestyle" },
+                { id: "p14", date: "2026-02-05", time: "10:00", sport: "alpine", name: "Women's Downhill Training", venue: "Cortina", status: "completed", result: "⚠️ CANCELLED - Poor weather" },
+                // Women's Hockey - Group Stage
+                { id: "p7a", date: "2026-02-05", time: "12:00", sport: "hockey", name: "Women's Hockey: USA vs Czech Republic", venue: "PalaItalia Santa Giulia", status: "completed", teams: ["🇺🇸 USA", "🇨🇿 Czech Republic"], result: "🇺🇸 USA wins 5-1 - Knight, Carpenter, Scamurra (2) score!" },
+                { id: "p7b", date: "2026-02-05", time: "12:00", sport: "hockey", name: "Women's Hockey: Finland vs Canada", venue: "PalaItalia Santa Giulia", status: "completed", teams: ["🇫🇮 Finland", "🇨🇦 Canada"], result: "⚠️ POSTPONED to Feb 12 - Finland norovirus outbreak" },
+                { id: "p8", date: "2026-02-05", time: "16:30", sport: "hockey", name: "Women's Hockey: Sweden vs Germany", venue: "PalaItalia Santa Giulia", status: "completed", teams: ["🇸🇪 Sweden", "🇩🇪 Germany"], result: "🇸🇪 Sweden wins 4-1" },
 
                 // Opening Ceremony
                 { id: "e1", date: "2026-02-06", time: "20:00", sport: "ceremony", name: "Opening Ceremony", venue: "San Siro Stadium", status: "upcoming" },
@@ -1213,7 +1220,7 @@
                 { id: "a15", name: "Ayumu Hirano", country: "Japan", countryFlag: "🇯🇵", sport: "snowboard", discipline: "Halfpipe", bio: "Olympic gold medalist known for triple corks.", photo: null },
 
                 // Canada
-                { id: "a16", name: "Mark McMorris", country: "Canada", countryFlag: "🇨🇦", sport: "snowboard", discipline: "Slopestyle/Big Air", bio: "⚠️ INJURED Feb 4 - Stretchered off after big air training crash. 3x Olympic bronze medalist, 2026 X Games gold. Status TBD.", photo: null },
+                { id: "a16", name: "Mark McMorris", country: "Canada", countryFlag: "🇨🇦", sport: "snowboard", discipline: "Slopestyle/Big Air", bio: "⚠️ OUT of Big Air (Feb 4 crash) - Released from hospital, focusing on Slopestyle (Feb 16-18). 3x Olympic bronze, 2026 X Games gold.", photo: null },
 
                 // Netherlands
                 { id: "a17", name: "Ireen Wüst", country: "Netherlands", countryFlag: "🇳🇱", sport: "speed-skating", discipline: "All Distances", bio: "Most decorated Olympic speed skater ever (retired, ambassador).", photo: null },
